@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="telegram:web_app" content="yes">
+    <title>Sultan Chain</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #0a0a0a);
+            color: var(--tg-theme-text-color, #ffffff);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+
+        /* Header with gradient border */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0a0a0a 100%);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #FFD700, transparent);
+        }
+
+        .user-info {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .balance-label {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.7);
+            font-weight: 500;
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0a0a0a;
+            margin: 5px 0;
+        }
+
+        .balance-usd {
+            font-size: 16px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .quick-action {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-action:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Features - Simplified */
+        .features {
+            padding: 0 20px;
+        }
+
+        .feature-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .feature-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+        }
+
+        .feature-badge {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Native Chains Grid */
+        .native-chains {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .chain-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chain-card:active {
+            transform: scale(0.95);
+            border-color: #FFD700;
+        }
+
+        .chain-card.selected {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+        }
+
+        .chain-logo {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .chain-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .chain-balance {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 3px;
+        }
+
+        /* Staking Simplified */
+        .staking-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .staking-stats {
+            flex: 1;
+        }
+
+        .staking-apy {
+            color: #4CAF50;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Governance Simplified */
+        .active-proposal {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .proposal-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .vote-bar {
+            display: flex;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .vote-for {
+            background: #4CAF50;
+            transition: width 0.3s ease;
+        }
+
+        .vote-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--tg-theme-secondary-bg-color, rgba(26, 26, 46, 0.95));
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 0;
+            z-index: 100;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            text-align: center;
+            padding: 5px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active {
+            color: #FFD700;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 3px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+        }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: var(--tg-theme-secondary-bg-color, #1a1a2e);
+            margin: 20px;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 360px;
+            margin: 20px auto;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        /* Forms */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--tg-theme-text-color, white);
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #0a0a0a;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--tg-theme-text-color, white);
+        }
+
+        /* Transaction List */
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .tx-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .tx-details {
+            flex: 1;
+        }
+
+        .tx-type {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .tx-time {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .tx-amount {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .tx-amount.positive {
+            color: #4CAF50;
+        }
+
+        .tx-amount.negative {
+            color: #FF6B6B;
+        }
+
+        /* Loading States */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.05) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Animations */
+        .slide-up {
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 380px) {
+            .balance-amount {
+                font-size: 28px;
+            }
+
+            .nav-label {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Sultan Chain</h1>
+            <div class="user-info" id="userInfo">Loading...</div>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="balance-card">
+            <div class="balance-label">Total Balance</div>
+            <div class="balance-amount" id="totalBalance">0 SLTN</div>
+            <div class="balance-usd" id="balanceUsd">≈ $0.00</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action" onclick="showSendModal()">Send</div>
+            <div class="quick-action" onclick="showReceiveModal()">Receive</div>
+            <div class="quick-action" onclick="buySltn()">Buy</div>
+        </div>
+
+        <!-- Main Features -->
+        <div class="features">
+            <!-- Native Interoperability -->
+            <div class="feature-section">
+                <div class="feature-header" onclick="toggleChains()">
+                    <div class="feature-title">
+                        <span class="feature-icon">⚡</span>
+                        <span>Native Chains</span>
+                    </div>
+                    <span class="feature-badge">Instant</span>
+                </div>
+                <div class="native-chains" id="nativeChains">
+                    <div class="chain-card selected" onclick="selectChain('sultan')">
+                        <div class="chain-logo">👑</div>
+                        <div class="chain-name">Sultan</div>
+                        <div class="chain-balance" id="sultanBalance">0 SLTN</div>
+                    </div>
+                    <div class="chain-card" onclick="selectChain('ton')">
+                        <div class="chain-logo">💎</div>
+                        <div class="chain-name">TON</div>
+                        <div class="chain-balance" id="tonBalance">0 TON</div>
+                    </div>
+                    <div class="chain-card" onclick="selectChain('ethereum')">
+                        <div class="chain-logo">Ξ</div>
+                        <div class="chain-name">Ethereum</div>
+                        <div class="chain-balance" id="ethBalance">0 ETH</div>
+                    </div>
+                    <div class="chain-card" onclick="selectChain('solana')">
+                        <div class="chain-logo">◎</div>
+                        <div class="chain-name">Solana</div>
+                        <div class="chain-balance" id="solBalance">0 SOL</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staking -->
+            <div class="feature-section">
+                <div class="feature-header" onclick="showStaking()">
+                    <div class="feature-title">
+                        <span class="feature-icon">💎</span>
+                        <span>Staking</span>
+                    </div>
+                </div>
+                <div class="staking-info">
+                    <div class="staking-stats">
+                        <div>Currently Staking</div>
+                        <div style="font-weight: 600; margin-top: 5px;">0 SLTN</div>
+                    </div>
+                    <div class="staking-apy">15-25% APY</div>
+                </div>
+            </div>
+
+            <!-- Governance -->
+            <div class="feature-section">
+                <div class="feature-header" onclick="showGovernance()">
+                    <div class="feature-title">
+                        <span class="feature-icon">🗳️</span>
+                        <span>Governance</span>
+                    </div>
+                    <span class="feature-badge" style="background: rgba(255, 107, 107, 0.2); color: #FF6B6B;">2 Active</span>
+                </div>
+                <div id="governancePreview" style="display: none;">
+                    <div class="active-proposal">
+                        <div class="proposal-title">Reduce Transaction Fees</div>
+                        <div class="vote-bar">
+                            <div class="vote-for" style="width: 73%;"></div>
+                        </div>
+                        <div class="vote-stats">
+                            <span>73% For</span>
+                            <span>2 days left</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validator Mining -->
+            <div class="feature-section">
+                <div class="feature-header" onclick="showValidator()">
+                    <div class="feature-title">
+                        <span class="feature-icon">⚡</span>
+                        <span>Validator</span>
+                    </div>
+                    <span class="feature-badge" id="validatorBadge" style="background: rgba(76, 175, 80, 0.2); color: #4CAF50;">Mining</span>
+                </div>
+                <div id="validatorPreview">
+                    <div style="background: rgba(255, 215, 0, 0.1); border-radius: 12px; padding: 15px; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 12px; opacity: 0.7;">Mining Rewards</div>
+                                <div style="font-size: 20px; font-weight: bold; color: #FFD700;" id="miningRewards">52 SLTN</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; opacity: 0.7;">Blocks Mined</div>
+                                <div style="font-size: 20px; font-weight: bold;" id="blocksMined">48</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="showValidator()">
+                        Open Validator Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-items">
+            <div class="nav-item active" onclick="showHome()">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </div>
+            <div class="nav-item" onclick="showTransactions()">
+                <div class="nav-icon">📊</div>
+                <div class="nav-label">Activity</div>
+            </div>
+            <div class="nav-item" onclick="showSettings()">
+                <div class="nav-icon">⚙️</div>
+                <div class="nav-label">Settings</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Modal -->
+    <div class="modal" id="sendModal">
+        <div class="modal-content slide-up">
+            <div class="modal-header">
+                <h2>Send</h2>
+                <span class="close-btn" onclick="closeModal('sendModal')">×</span>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Chain</div>
+                <select class="input-field" id="sendChain" onchange="updateSendForm()">
+                    <option value="sultan">Sultan Chain</option>
+                    <option value="ton">TON</option>
+                    <option value="ethereum">Ethereum</option>
+                    <option value="solana">Solana</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Recipient</div>
+                <input type="text" class="input-field" id="recipientAddress" placeholder="Address or @username">
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Amount</div>
+                <input type="number" class="input-field" id="sendAmount" placeholder="0.00">
+                <div style="font-size: 12px; opacity: 0.6; margin-top: 5px;">
+                    Available: <span id="availableBalance">0 SLTN</span>
+                </div>
+            </div>
+
+            <div style="background: rgba(255, 215, 0, 0.1); border-radius: 10px; padding: 12px; margin: 15px 0;">
+                <div style="display: flex; justify-content: space-between; font-size: 14px;">
+                    <span>Network Fee</span>
+                    <span id="networkFee">~0.001 SLTN</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="confirmSend()">Send</button>
+        </div>
+    </div>
+
+    <!-- Receive Modal -->
+    <div class="modal" id="receiveModal">
+        <div class="modal-content slide-up">
+            <div class="modal-header">
+                <h2>Receive</h2>
+                <span class="close-btn" onclick="closeModal('receiveModal')">×</span>
+            </div>
+
+            <div style="text-align: center; padding: 20px;">
+                <div id="qrCode" style="margin: 20px auto;">
+                    <!-- QR Code will be generated here -->
+                    <div style="width: 200px; height: 200px; background: white; margin: 0 auto; border-radius: 10px;"></div>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin: 20px 0;">
+                    <div style="font-size: 14px; opacity: 0.6; margin-bottom: 5px;">Your address</div>
+                    <div id="receiveAddress" style="font-family: monospace; word-break: break-all; font-size: 14px;">Loading...</div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="copyAddress()">Copy Address</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staking Modal -->
+    <div class="modal" id="stakingModal">
+        <div class="modal-content slide-up">
+            <div class="modal-header">
+                <h2>Staking</h2>
+                <span class="close-btn" onclick="closeModal('stakingModal')">×</span>
+            </div>
+
+            <div style="display: grid; gap: 12px;">
+                <div class="staking-tier" onclick="selectStakingTier(30, 15)" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; cursor: pointer;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600;">30 Days</div>
+                            <div style="font-size: 14px; opacity: 0.6;">Flexible</div>
+                        </div>
+                        <div style="color: #4CAF50; font-size: 20px; font-weight: bold;">15% APY</div>
+                    </div>
+                </div>
+
+                <div class="staking-tier" onclick="selectStakingTier(90, 20)" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; cursor: pointer;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600;">90 Days</div>
+                            <div style="font-size: 14px; opacity: 0.6;">Standard</div>
+                        </div>
+                        <div style="color: #4CAF50; font-size: 20px; font-weight: bold;">20% APY</div>
+                    </div>
+                </div>
+
+                <div class="staking-tier" onclick="selectStakingTier(180, 25)" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; cursor: pointer;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600;">180 Days</div>
+                            <div style="font-size: 14px; opacity: 0.6;">Premium</div>
+                        </div>
+                        <div style="color: #4CAF50; font-size: 20px; font-weight: bold;">25% APY</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 20px;">
+                <div class="input-label">Amount to Stake</div>
+                <input type="number" class="input-field" id="stakeAmount" placeholder="0.00 SLTN">
+            </div>
+
+            <button class="btn btn-primary" onclick="confirmStaking()">Stake SLTN</button>
+        </div>
+    </div>
+
+    <!-- Governance Modal -->
+    <div class="modal" id="governanceModal">
+        <div class="modal-content slide-up">
+            <div class="modal-header">
+                <h2>Governance</h2>
+                <span class="close-btn" onclick="closeModal('governanceModal')">×</span>
+            </div>
+
+            <div style="background: rgba(255, 215, 0, 0.1); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Your Voting Power</span>
+                    <span style="font-weight: 600;">0 SLTN</span>
+                </div>
+            </div>
+
+            <div id="proposalList">
+                <!-- Proposals will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Validator Modal -->
+    <div class="modal" id="validatorModal">
+        <div class="modal-content slide-up">
+            <div class="modal-header">
+                <h2>⚡ Sultan Validator</h2>
+                <span class="close-btn" onclick="closeModal('validatorModal')">×</span>
+            </div>
+
+            <!-- Validator Status -->
+            <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); border-radius: 15px; padding: 20px; margin-bottom: 20px; text-align: center;">
+                <div style="font-size: 14px; opacity: 0.9;">Validator Status</div>
+                <div style="font-size: 24px; font-weight: bold; margin: 10px 0;" id="validatorTierDisplay">Light Validator</div>
+                <div style="display: flex; justify-content: center; gap: 10px; font-size: 12px;">
+                    <span style="background: rgba(255, 255, 255, 0.2); padding: 4px 8px; border-radius: 12px;">Mobile Optimized</span>
+                    <span style="background: rgba(255, 255, 255, 0.2); padding: 4px 8px; border-radius: 12px;" id="validatorStatus">Active</span>
+                </div>
+            </div>
+
+            <!-- Mining Stats -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; text-align: center;">
+                    <div style="font-size: 28px; font-weight: bold; color: #FFD700;" id="modalBlocksMined">48</div>
+                    <div style="font-size: 14px; opacity: 0.7;">Blocks Mined</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; text-align: center;">
+                    <div style="font-size: 28px; font-weight: bold; color: #4CAF50;" id="modalEarnings">52</div>
+                    <div style="font-size: 14px; opacity: 0.7;">SLTN Earned</div>
+                </div>
+            </div>
+
+            <!-- Current Mining -->
+            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="font-weight: 600;">Mining Block #<span id="currentBlock">1,247</span></span>
+                    <span style="font-size: 24px;" id="miningIcon">⛏️</span>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.1); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="miningProgress" style="background: linear-gradient(90deg, #FFD700, #FFA500); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; opacity: 0.7;">
+                    <span>Progress: <span id="miningPercent">0</span>%</span>
+                    <span>Est. Time: <span id="miningTime">~30s</span></span>
+                </div>
+            </div>
+
+            <!-- Mining Power -->
+            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                <div style="font-size: 14px; opacity: 0.7; margin-bottom: 10px;">Mining Power</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+                    <div>
+                        <div style="font-size: 20px; font-weight: bold;">1x</div>
+                        <div style="font-size: 12px; opacity: 0.6;">Base</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 20px; font-weight: bold; color: #FFD700;">1.5x</div>
+                        <div style="font-size: 12px; opacity: 0.6;">Mobile</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 20px; font-weight: bold;">1.5x</div>
+                        <div style="font-size: 12px; opacity: 0.6;">Total</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validator Tiers -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 15px;">Upgrade Validator</h3>
+                <div style="display: grid; gap: 10px;">
+                    <div style="background: rgba(76, 175, 80, 0.2); border: 1px solid #4CAF50; border-radius: 12px; padding: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600;">Light Validator</div>
+                                <div style="font-size: 14px; opacity: 0.7;">Mobile Optimized</div>
+                            </div>
+                            <div style="color: #4CAF50;">Current</div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; cursor: pointer;" onclick="upgradeValidator('full')">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600;">Full Validator</div>
+                                <div style="font-size: 14px; opacity: 0.7;">10,000 SLTN Required</div>
+                            </div>
+                            <div style="color: #FFD700;">2x Rewards</div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; cursor: pointer;" onclick="upgradeValidator('enterprise')">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600;">Enterprise Validator</div>
+                                <div style="font-size: 14px; opacity: 0.7;">100,000 SLTN Required</div>
+                            </div>
+                            <div style="color: #FFD700;">5x Rewards</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="toggleMining()" id="miningToggle">Start Mining</button>
+        </div>
+    </div>
+
+    <script>
+        // Telegram WebApp initialization
+        let tg;
+        if (window.Telegram && window.Telegram.WebApp) {
+            tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            tg.setHeaderColor('#1a1a2e');
+            tg.setBackgroundColor('#0a0a0a');
+        } else {
+            // Fallback for testing outside Telegram
+            tg = {
+                ready: () => {},
+                expand: () => {},
+                setHeaderColor: () => {},
+                setBackgroundColor: () => {},
+                HapticFeedback: {
+                    impactOccurred: () => console.log('Haptic feedback'),
+                    notificationOccurred: () => console.log('Notification feedback')
+                },
+                showAlert: (msg) => alert(msg),
+                showPopup: (params, callback) => {
+                    if (confirm(params.message)) {
+                        callback(params.buttons[0].id);
+                    } else {
+                        callback(params.buttons[1].id);
+                    }
+                },
+                BackButton: {
+                    show: () => {},
+                    onClick: () => {}
+                },
+                initDataUnsafe: {
+                    user: { username: 'test_user' }
+                },
+                openLink: (url) => window.open(url, '_blank'),
+                close: () => window.close()
+            };
+        }
+
+        // State
+        let state = {
+            selectedChain: 'sultan',
+            balances: {
+                sultan: 0,
+                ton: 0,
+                ethereum: 0,
+                solana: 0
+            },
+            address: {
+                sultan: '',
+                ton: '',
+                ethereum: '',
+                solana: ''
+            },
+            stakingDuration: 0,
+            stakingAPY: 0
+        };
+
+        // Validator state
+        let validatorState = {
+            isMining: false,
+            blocksMined: 48,
+            earnings: 52,
+            currentBlock: 1247,
+            miningProgress: 0,
+            validatorTier: 'light',
+            miningSpeed: 1.5 // Mobile bonus
+        };
+
+        // Initialize
+        function init() {
+            // Set user info
+            const user = tg.initDataUnsafe.user;
+            document.getElementById('userInfo').textContent = 
+                `@${user?.username || 'anonymous'} • Connected`;
+
+            // Generate addresses
+            state.address.sultan = 'SULTAN_' + generateAddress();
+            state.address.ton = 'EQ' + generateAddress().substring(0, 44);
+            state.address.ethereum = '0x' + generateAddress();
+            state.address.solana = generateSolanaAddress();
+
+            // Mock balances
+            state.balances.sultan = Math.floor(Math.random() * 10000);
+            state.balances.ton = (Math.random() * 1000).toFixed(2);
+            state.balances.ethereum = (Math.random() * 10).toFixed(4);
+            state.balances.solana = (Math.random() * 100).toFixed(2);
+
+            updateUI();
+        }
+
+        function generateAddress() {
+            return Array.from({length: 8}, () => 
+                Math.random().toString(36).substr(2, 5)
+            ).join('').toUpperCase();
+        }
+
+        function generateSolanaAddress() {
+            const chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+            return Array.from({length: 44}, () => 
+                chars.charAt(Math.floor(Math.random() * chars.length))
+            ).join('');
+        }
+
+        function updateUI() {
+            // Update balance including validator earnings
+            const totalSLTN = state.balances.sultan + validatorState.earnings;
+            const totalUSD = (totalSLTN * 0.1) + 
+                           (state.balances.ton * 5) +
+                           (state.balances.ethereum * 3000) + 
+                           (state.balances.solana * 100);
+
+            document.getElementById('totalBalance').textContent = 
+                `${totalSLTN.toLocaleString()} SLTN`;
+            document.getElementById('balanceUsd').textContent = 
+                `≈ $${totalUSD.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            // Update chain balances
+            document.getElementById('sultanBalance').textContent = 
+                `${state.balances.sultan} SLTN`;
+            document.getElementById('tonBalance').textContent = 
+                `${state.balances.ton} TON`;
+            document.getElementById('ethBalance').textContent = 
+                `${state.balances.ethereum} ETH`;
+            document.getElementById('solBalance').textContent = 
+                `${state.balances.solana} SOL`;
+        }
+
+        function selectChain(chain) {
+            state.selectedChain = chain;
+
+            // Update UI
+            document.querySelectorAll('.chain-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.chain-card').classList.add('selected');
+
+            // Haptic feedback
+            tg.HapticFeedback.impactOccurred('light');
+
+            // Show cross-chain transfer option if different chain selected
+            if (chain !== 'sultan') {
+                showCrossChainOption();
+            }
+        }
+
+        function showCrossChainOption() {
+            tg.showPopup({
+                title: 'Cross-Chain Transfer',
+                message: `Transfer assets between Sultan and ${state.selectedChain}?`,
+                buttons: [
+                    {id: 'transfer', type: 'default', text: 'Transfer'},
+                    {id: 'cancel', type: 'cancel'}
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'transfer') {
+                    showCrossChainTransfer();
+                }
+            });
+        }
+
+        function showCrossChainTransfer() {
+            // Implement cross-chain transfer
+            tg.showAlert('Cross-chain transfer coming soon!');
+        }
+
+        function showSendModal() {
+            document.getElementById('sendModal').style.display = 'block';
+            document.getElementById('availableBalance').textContent = 
+                `${state.balances[state.selectedChain]} ${getTokenSymbol(state.selectedChain)}`;
+        }
+
+        function showReceiveModal() {
+            document.getElementById('receiveModal').style.display = 'block';
+            document.getElementById('receiveAddress').textContent = 
+                state.address[state.selectedChain];
+        }
+
+        function showStaking() {
+            document.getElementById('stakingModal').style.display = 'block';
+        }
+
+        function showGovernance() {
+            document.getElementById('governanceModal').style.display = 'block';
+            loadProposals();
+        }
+
+        function showValidator() {
+            document.getElementById('validatorModal').style.display = 'block';
+            updateValidatorUI();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function getTokenSymbol(chain) {
+            const symbols = {
+                sultan: 'SLTN',
+                ton: 'TON',
+                ethereum: 'ETH',
+                solana: 'SOL'
+            };
+            return symbols[chain] || 'TOKEN';
+        }
+
+        function selectStakingTier(days, apy) {
+            state.stakingDuration = days;
+            state.stakingAPY = apy;
+
+            // Update UI
+            document.querySelectorAll('.staking-tier').forEach(tier => {
+                tier.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            });
+            event.target.closest('.staking-tier').style.border = '1px solid #FFD700';
+
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function confirmSend() {
+            const amount = document.getElementById('sendAmount').value;
+            const recipient = document.getElementById('recipientAddress').value;
+
+            if (!amount || !recipient) {
+                tg.showAlert('Please enter amount and recipient');
+                return;
+            }
+
+            tg.showPopup({
+                title: 'Confirm Transaction',
+                message: `Send ${amount} ${getTokenSymbol(state.selectedChain)} to ${recipient}?`,
+                buttons: [
+                    {id: 'confirm', type: 'default', text: 'Confirm'},
+                    {id: 'cancel', type: 'cancel'}
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'confirm') {
+                    processSend(amount, recipient);
+                }
+            });
+        }
+
+        function processSend(amount, recipient) {
+            // Simulate send
+            state.balances[state.selectedChain] -= parseFloat(amount);
+            updateUI();
+
+            tg.HapticFeedback.notificationOccurred('success');
+            closeModal('sendModal');
+
+            tg.showAlert(`Successfully sent ${amount} ${getTokenSymbol(state.selectedChain)}!`);
+        }
+
+        function updateSendForm() {
+            const chain = document.getElementById('sendChain').value;
+            state.selectedChain = chain;
+            document.getElementById('availableBalance').textContent = 
+                `${state.balances[chain]} ${getTokenSymbol(chain)}`;
+        }
+
+        function confirmStaking() {
+            const amount = document.getElementById('stakeAmount').value;
+
+            if (!amount || !state.stakingDuration) {
+                tg.showAlert('Please select a tier and enter amount');
+                return;
+            }
+
+            tg.showPopup({
+                title: 'Confirm Staking',
+                message: `Stake ${amount} SLTN for ${state.stakingDuration} days at ${state.stakingAPY}% APY?`,
+                buttons: [
+                    {id: 'confirm', type: 'default', text: 'Confirm'},
+                    {id: 'cancel', type: 'cancel'}
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'confirm') {
+                    processStaking(amount);
+                }
+            });
+        }
+
+        function processStaking(amount) {
+            // Simulate staking
+            state.balances.sultan -= parseFloat(amount);
+            updateUI();
+
+            tg.HapticFeedback.notificationOccurred('success');
+            closeModal('stakingModal');
+
+            tg.showAlert(`Successfully staked ${amount} SLTN!`);
+        }
+
+        function loadProposals() {
+            const proposals = [
+                {
+                    id: 1,
+                    title: 'Reduce Transaction Fees',
+                    description: 'Lower base fee from 0.01 to 0.005 SLTN',
+                    forVotes: 73,
+                    againstVotes: 27,
+                    timeLeft: '2 days'
+                },
+                {
+                    id: 2,
+                    title: 'Add USDT Support',
+                    description: 'Enable USDT on native chains',
+                    forVotes: 89,
+                    againstVotes: 11,
+                    timeLeft: '4 days'
+                }
+            ];
+
+            const proposalList = document.getElementById('proposalList');
+            proposalList.innerHTML = proposals.map(p => `
+                <div class="active-proposal" style="margin-bottom: 15px;">
+                    <div class="proposal-title">${p.title}</div>
+                    <div style="font-size: 14px; opacity: 0.7; margin: 5px 0;">${p.description}</div>
+                    <div class="vote-bar">
+                        <div class="vote-for" style="width: ${p.forVotes}%;"></div>
+                    </div>
+                    <div class="vote-stats">
+                        <span>${p.forVotes}% For</span>
+                        <span>${p.timeLeft} left</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        <button class="btn" style="background: #4CAF50; color: white;" onclick="vote(${p.id}, true)">
+                            Vote For
+                        </button>
+                        <button class="btn" style="background: #FF6B6B; color: white;" onclick="vote(${p.id}, false)">
+                            Vote Against
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function vote(proposalId, support) {
+            const voteType = support ? 'FOR' : 'AGAINST';
+
+            tg.showPopup({
+                title: 'Confirm Vote',
+                message: `Cast your vote ${voteType}?`,
+                buttons: [
+                    {id: 'confirm', type: 'default', text: 'Confirm'},
+                    {id: 'cancel', type: 'cancel'}
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'confirm') {
+                    tg.HapticFeedback.notificationOccurred('success');
+                    tg.showAlert('Vote submitted!');
+                }
+            });
+        }
+
+        function copyAddress() {
+            navigator.clipboard.writeText(state.address[state.selectedChain]);
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert('Address copied!');
+        }
+
+        function buySltn() {
+            tg.openLink('https://app.sultanchain.com/buy');
+        }
+
+        // Validator functions
+        function updateValidatorUI() {
+            // Update modal stats
+            document.getElementById('modalBlocksMined').textContent = validatorState.blocksMined;
+            document.getElementById('modalEarnings').textContent = validatorState.earnings;
+            document.getElementById('currentBlock').textContent = validatorState.currentBlock.toLocaleString();
+
+            // Update mining button
+            if (validatorState.isMining) {
+                document.getElementById('miningToggle').textContent = 'Stop Mining';
+                document.getElementById('miningToggle').style.background = 'linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%)';
+                document.getElementById('validatorStatus').textContent = 'Mining';
+                document.getElementById('validatorBadge').textContent = 'Mining';
+                document.getElementById('validatorBadge').style.background = 'rgba(255, 215, 0, 0.2)';
+                document.getElementById('validatorBadge').style.color = '#FFD700';
+                startMiningAnimation();
+            } else {
+                document.getElementById('miningToggle').textContent = 'Start Mining';
+                document.getElementById('miningToggle').style.background = '';
+                document.getElementById('validatorStatus').textContent = 'Idle';
+                document.getElementById('validatorBadge').textContent = 'Idle';
+                document.getElementById('validatorBadge').style.background = 'rgba(76, 175, 80, 0.2)';
+                document.getElementById('validatorBadge').style.color = '#4CAF50';
+            }
+
+            // Update preview
+            document.getElementById('miningRewards').textContent = validatorState.earnings + ' SLTN';
+            document.getElementById('blocksMined').textContent = validatorState.blocksMined;
+        }
+
+        function toggleMining() {
+            validatorState.isMining = !validatorState.isMining;
+
+            if (validatorState.isMining) {
+                tg.HapticFeedback.impactOccurred('heavy');
+                tg.showAlert('Mining started! Your device is now validating blocks.');
+
+                // Update icon animation
+                document.getElementById('miningIcon').style.animation = 'pulse 1s infinite';
+            } else {
+                tg.HapticFeedback.impactOccurred('medium');
+                tg.showAlert('Mining stopped.');
+                document.getElementById('miningIcon').style.animation = '';
+                stopMiningAnimation();
+            }
+
+            updateValidatorUI();
+        }
+
+        let miningInterval;
+        function startMiningAnimation() {
+            let progress = 0;
+            const miningMultiplier = validatorState.validatorTier === 'enterprise' ? 5 : 
+                                   validatorState.validatorTier === 'full' ? 2 : 1;
+
+            miningInterval = setInterval(() => {
+                progress += (Math.random() * 5) * validatorState.miningSpeed;
+
+                if (progress >= 100) {
+                    // Block mined!
+                    progress = 0;
+                    validatorState.currentBlock++;
+                    validatorState.blocksMined++;
+
+                    // Calculate rewards based on tier
+                    const baseReward = Math.floor(Math.random() * 3) + 1;
+                    const reward = baseReward * miningMultiplier;
+                    validatorState.earnings += reward;
+
+                    // Update displays
+                    document.getElementById('currentBlock').textContent = validatorState.currentBlock.toLocaleString();
+                    document.getElementById('modalBlocksMined').textContent = validatorState.blocksMined;
+                    document.getElementById('modalEarnings').textContent = validatorState.earnings;
+
+                    // Update main balance
+                    state.balances.sultan += reward;
+                    updateUI();
+
+                    // Update preview
+                    document.getElementById('miningRewards').textContent = validatorState.earnings + ' SLTN';
+                    document.getElementById('blocksMined').textContent = validatorState.blocksMined;
+
+                    // Show reward notification
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
+
+                document.getElementById('miningProgress').style.width = progress + '%';
+                document.getElementById('miningPercent').textContent = Math.floor(progress);
+
+                // Update time estimate
+                const timeLeft = Math.floor((100 - progress) / (3 * validatorState.miningSpeed));
+                document.getElementById('miningTime').textContent = `~${timeLeft}s`;
+            }, 1000);
+        }
+
+        function stopMiningAnimation() {
+            clearInterval(miningInterval);
+            document.getElementById('miningProgress').style.width = '0%';
+            document.getElementById('miningPercent').textContent = '0';
+            document.getElementById('miningTime').textContent = '~30s';
+        }
+
+        function upgradeValidator(tier) {
+            const requirements = {
+                full: { cost: 10000, multiplier: 2, name: 'Full Validator' },
+                enterprise: { cost: 100000, multiplier: 5, name: 'Enterprise Validator' }
+            };
+
+            const req = requirements[tier];
+
+            tg.showPopup({
+                title: 'Upgrade Validator',
+                message: `Upgrade to ${req.name}?\n\nCost: ${req.cost.toLocaleString()} SLTN\nReward multiplier: ${req.multiplier}x\n\nYour balance: ${state.balances.sultan.toLocaleString()} SLTN`,
+                buttons: [
+                    {id: 'upgrade', type: 'default', text: 'Upgrade'},
+                    {id: 'cancel', type: 'cancel'}
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'upgrade') {
+                    if (state.balances.sultan >= req.cost) {
+                        state.balances.sultan -= req.cost;
+                        validatorState.validatorTier = tier;
+                        document.getElementById('validatorTierDisplay').textContent = req.name;
+                        updateUI();
+                        updateValidatorUI();
+                        tg.HapticFeedback.notificationOccurred('success');
+                        tg.showAlert(`Upgraded to ${req.name}!`);
+                    } else {
+                        tg.HapticFeedback.notificationOccurred('error');
+                        tg.showAlert('Insufficient balance');
+                    }
+                }
+            });
+        }
+
+        // Navigation
+        function showHome() {
+            // Already on home
+        }
+
+        function showTransactions() {
+            tg.showAlert('Transaction history coming soon!');
+        }
+
+        function showSettings() {
+            tg.showAlert('Settings coming soon!');
+        }
+
+        function toggleChains() {
+            // Toggle native chains visibility
+            const chainsDiv = document.getElementById('nativeChains');
+            chainsDiv.style.display = chainsDiv.style.display === 'none' ? 'grid' : 'none';
+        }
+
+        // Handle back button
+        tg.BackButton.show();
+        tg.BackButton.onClick(() => {
+            const modals = ['sendModal', 'receiveModal', 'stakingModal', 'governanceModal', 'validatorModal'];
+            const openModal = modals.find(id => 
+                document.getElementById(id).style.display === 'block'
+            );
+
+            if (openModal) {
+                closeModal(openModal);
+            } else {
+                tg.close();
+            }
+        });
+
+        // Initialize app
+        init();
+    </script>
+</body>
+</html>

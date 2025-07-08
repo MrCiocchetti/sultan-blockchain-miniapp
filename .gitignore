@@ -1,1 +1,5 @@
 /target
+--auth-local=trust/
+*.log
+target/
+.env
